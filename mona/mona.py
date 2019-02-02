@@ -1,5 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+import argparse
 import random
 
 reply_map = {
@@ -30,13 +31,19 @@ def message(bot, update):
             update.message.reply_text(random.choice(v))
 
 
-updater = Updater('x:x')
+def main():
+    parser = argparse.ArgumentParser(description='Mona')
+    parser.add_argument('--token', help="token of bot", required=True)
+    args = parser.parse_args()
 
-updater.dispatcher.add_handler(CommandHandler('set', hello, pass_args=True))
-updater.dispatcher.add_handler(
-    MessageHandler(Filters.text, message)
-)
+    updater = Updater(args.token)
+    updater.dispatcher.add_handler(CommandHandler('set', hello, pass_args=True))
+    updater.dispatcher.add_handler(
+        MessageHandler(Filters.text, message)
+    )
+    updater.start_polling()
+    updater.idle()
 
 
-updater.start_polling()
-updater.idle()
+if __name__ == "__main__":
+    main()
