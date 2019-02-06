@@ -2,6 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import argparse
 import random
+import re
 
 reply_map = {
     "sony": ["大法好"],
@@ -26,6 +27,16 @@ def hello(bot, update, args):
 
 def message(bot, update):
     text = update.message.text
+    # reply with regular expression
+    try:
+        result = re.findall(r'(\w+)还是不\1', text)
+        if result:
+            message = random.choice(["不", ""]) + result[0]
+            update.message.reply_text(message)
+            return
+    except Exception:
+        pass
+    # reply with predefined word
     for k, v in reply_map.items():
         if k in text:
             update.message.reply_text(random.choice(v))
@@ -37,7 +48,8 @@ def main():
     args = parser.parse_args()
 
     updater = Updater(args.token)
-    updater.dispatcher.add_handler(CommandHandler('set', hello, pass_args=True))
+    updater.dispatcher.add_handler(
+        CommandHandler('set', hello, pass_args=True))
     updater.dispatcher.add_handler(
         MessageHandler(Filters.text, message)
     )
